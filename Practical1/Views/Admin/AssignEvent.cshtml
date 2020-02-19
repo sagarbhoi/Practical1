@@ -9,7 +9,7 @@
     <div class="row form-group">
 
        
-                @Html.Label("U_id","UserName")
+                @Html.Label("U_id", "UserName")
              <select name="U_id" class="form-control">
                     @foreach (var item in Model.users)
                     {
@@ -18,7 +18,7 @@
                 </select>
         </div>
     <div class="row form-group">
-                @Html.Label("Event_Id","Event Title")
+                @Html.Label("Event_Id", "Event Title")
                 <select name="Event_Id" class="form-control">
                     @foreach (var item in Model.events)
                     {
@@ -29,6 +29,7 @@
     <div class="row form-group">
             <button type="submit" class="btn btn-primary">Submit</button>
     </div>
+}
     <hr />
     <div class="row">
         <h1>Event Assign To User List</h1>
@@ -50,11 +51,10 @@
             <td>@item.Event.Title</td>
             <td>@item.Event.Description</td>
             <td>@item.User.FirstName</td>
-            <td><button onclick="location.href='@Url.Action("AssignDelete","Admin",new  { id = @item.Event_Id })'" class="btn btn-primary">Delete</button></td>
+            <td><button onclick="location.href='@Url.Action("AssignDelete","Admin",new  { id = @item.Event_Id, onclick = "return confirm('Are sure wants to LogOut?');" })'" class="btn btn-primary">Delete</button></td>
         </tr>i++;
                 }
             }
         </table>
         </div>
-        }
 

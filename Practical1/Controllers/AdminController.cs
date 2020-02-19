@@ -95,7 +95,8 @@ namespace Practical1.Controllers
         }
         public ActionResult AssignDelete(int id)
         {
-            db.Event_User.Remove(db.Event_User.Find(id));
+            var r = db.Event_User.Where(x=>x.Event_Id==id).FirstOrDefault();
+            db.Event_User.Remove(r);
             db.SaveChanges();
             TempData["error"] = "Deleted Sucessfully";
             return RedirectToAction("AssignEvent");

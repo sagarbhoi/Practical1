@@ -37,7 +37,7 @@
             <td>@item.Title</td>
             <td>@item.Description</td>
             <td><button onclick="location.href='@Url.Action("EditEvent","Admin",new  { id = @item.Event_Id })'" class="btn btn-primary">Edit</button></td>
-            <td><button onclick="location.href='@Url.Action("DeleteEvent","Admin",new  { id = @item.Event_Id })'" class="btn btn-primary">Delete</button></td>
+            <td><button onclick="location.href='@Url.Action("DeleteEvent","Admin",new  { id = @item.Event_Id})'" class="btn btn-primary">Delete</button></td>
         </tr>
                     i++;
                 }
