@@ -1,0 +1,39 @@
+﻿@model Practical1.User
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .row {
+        margin-top: 1%;
+    }
+</style>
+@using (Html.BeginForm())
+{
+
+    @Html.AntiForgeryToken()
+    <center>
+        <h3>User Login</h3>
+    </center>
+    <center>
+        <div class="row form-group">
+        </div>
+        <div class="row">
+            @Html.TextBoxFor(model => model.Email, new { @class = "form-control",@Placeholder="Email" })
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+        </div>
+        <div class="row form-group">
+        </div>
+        <div class="row">
+            @Html.PasswordFor(model => model.Password, new { @class = "form-control",@Placeholder="Password" })
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+        </div>
+        <div class="row form-group">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+        <div class="row">
+            <p>If Not Register Please...@Html.ActionLink("Sign Up", "SignUp") </p>
+            @Html.Hidden("Role", ViewBag.Role as String)
+        </div>
+    </center>
+
+}

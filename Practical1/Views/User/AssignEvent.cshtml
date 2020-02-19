@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Practical1.Event_User>
+@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+<div class="row">
+    <h1>Assign Event</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sr.No</th>
+                <th>Title</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        @if (Model != null)
+        {
+            int i = 1;
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@i</td>
+                    <td>@item.Event.Title</td>
+                    <td>@item.Event.Description</td>
+                </tr>
+                i++;
+            }
+        }
+    </table>
+</div>

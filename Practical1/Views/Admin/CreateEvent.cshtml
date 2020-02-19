@@ -1,0 +1,49 @@
+﻿@model IEnumerable<Practical1.Event>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="row form-group">
+                @Html.Label("Title")
+                @Html.TextBox("Title", "", new { @class = "form-control" })
+    </div>
+    <div class="row form-group">
+        @Html.Label("Description")
+                @Html.TextArea("Description", "", new { @class = "form-control" })
+     </div>
+    <div class="row form-group">
+       <button type="submit" class="btn btn-primary">Submit</button>
+       </div>
+}
+    <hr />
+    <div class="row">
+        <h1>List Of Events Created</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sr.No</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            @if (Model != null)
+            { int i = 1;
+                foreach (var item in Model)
+                {
+        <tr>
+            <td>@i</td>
+            <td>@item.Title</td>
+            <td>@item.Description</td>
+            <td><button onclick="location.href='@Url.Action("EditEvent","Admin",new  { id = @item.Event_Id })'" class="btn btn-primary">Edit</button></td>
+            <td><button onclick="location.href='@Url.Action("DeleteEvent","Admin",new  { id = @item.Event_Id })'" class="btn btn-primary">Delete</button></td>
+        </tr>
+                    i++;
+                }
+            }
+        </table>
+
+    </div>
+
+

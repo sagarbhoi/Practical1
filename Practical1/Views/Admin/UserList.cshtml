@@ -1,0 +1,37 @@
+﻿@model IEnumerable<Practical1.User>
+
+@{
+    ViewBag.Title = "UserList";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="row">
+    <h1>List Of Users</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sr.No</th>
+                <th>Title</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        @if (Model != null)
+        {
+            int i = 1;
+            foreach (var item in Model)
+            {
+            <tr>
+        <td>@i</td>
+        <td>@item.FirstName&nbsp;@item.LastName</td>
+        <td>@item.Email</td>
+        <td>@item.Address</td>
+        <td>@item.Role</td>
+        <td><button onclick="location.href='@Url.Action("EditUser","Admin",new  { id = @item.U_id })'" class="btn btn-primary">Edit</button></td>
+        <td><button onclick="location.href='@Url.Action("DeleteUser","Admin",new  { id = @item.U_id })'" class="btn btn-primary">Delete</button></td>
+         </tr>
+                i++;
+            }
+        }
+    </table>
+
+</div>
+
