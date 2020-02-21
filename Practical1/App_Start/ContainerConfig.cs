@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Integration.Mvc;
+using Practical1.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace Practical1.App_Start
             var builer = new ContainerBuilder();
             builer.RegisterControllers(typeof(MvcApplication).Assembly);
             builer.RegisterType<Practical1Entities>().InstancePerRequest();
+            builer.RegisterType<DbServices>().InstancePerRequest();
             var container = builer.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
         }

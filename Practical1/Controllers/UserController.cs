@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Practical1.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,8 +10,10 @@ namespace Practical1.Controllers
     public class UserController : Controller
     {
         Practical1Entities db;
+        DbServices dbService;
         public UserController(Practical1Entities db)
         {
+           dbService= new DbServices(db);
             this.db = db;
         }
         // GET: User
@@ -23,7 +26,7 @@ namespace Practical1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Index(User user)
         {
-            var r = db.Users.Where(x=>x.Email.Equals(user.Email) && x.Password.Equals(user.Password) && x.Role.Equals(user.Role)).SingleOrDefault();
+            var r = dbService.UserAuthenticate(user);
             if(r==null)
             {
                 TempData["error"] = "Invalide Username Or Password";
@@ -50,20 +53,20 @@ namespace Practical1.Controllers
                     if(db.Users.Where(x=>x.Email.Equals(user.Email)).FirstOrDefault()!=null)
                     {
                         TempData["error"] = "Already registered Please Login..";
-                        return RedirectToAction("Index");
+                        
                     }
-                    db.Users.Add(user);
-                    db.SaveChanges();
-                    TempData["error"] = "Sucessfully registered";
-                    return RedirectToAction("Index");
-
+                    else if(dbService.SaveUser(user))
+                    {
+                        TempData["error"] = "Sucessfully registered";
+                    }
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     TempData["error"] = "Something Went Wrong";
                     return View();
-
                 }
+                return RedirectToAction("Index");
 
             }
             else
@@ -81,6 +84,7 @@ namespace Practical1.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return View("Index");
             }
         }

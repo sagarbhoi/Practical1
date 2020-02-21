@@ -5,18 +5,17 @@ using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-
+using PagedList;
 namespace Practical1.Controllers
 {
     public class AdminController : Controller
     {
         // GET: Admin
-        Practical1Entities db;
-        AssignEvent assignEvent;
-        public AdminController(Practical1Entities db)
+
+        DbServices dbService;
+        public AdminController(DbServices dbService)
         {
-            assignEvent = new AssignEvent();
-            this.db = db;
+            this.dbService = dbService;
         }
         public ActionResult Index()
         {
@@ -26,115 +25,162 @@ namespace Practical1.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Index(User user)
-        {
-            var r = db.Users.Where(x => x.Email.Equals(user.Email) && x.Password.Equals(user.Password) && x.Role.Equals(user.Role)).SingleOrDefault();
-
-                if (r == null)
-                {
-                    TempData["error"] = "Invalide Username Or Password";
-                    return View();
-                }
-                Session["email"] = user.Email;
-                Session["name"] = r.FirstName;
-                return RedirectToAction("Home");
-            
+        {       
+               var r = dbService.UserAuthenticate(user);
+               if (r==null)
+               {
+               TempData["error"] = "Invalide Username Or Password";
+               return View();
+               }
+               else
+               {
+               Session["email"] = user.Email;
+               Session["name"] = r.FirstName;
+               return RedirectToAction("Home");
+               }
         }
-        public ActionResult CreateEvent()
+        public ActionResult CreateEvent(int ?page)
         {
-            return View(db.Events.ToList());
+            int pageSize = 3;
+            int pageNumber = (page ?? 1);
+            return View(dbService.GetAllEvents().ToPagedList(pageNumber, pageSize));
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateEvent(Event events)
+        public ActionResult CreateEvent(Event events,int ?page)
         {
-            try
+            if(dbService.SaveEvent(events))
             {
-                db.Events.Add(events);
-                db.SaveChanges();
                 TempData["error"] = "Event Created Sucessfully";
             }
-            catch(Exception ex)
+            else
             {
-                TempData["error"] = ex.Message;
+                TempData["error"] = "Something Wrong";
             }
-            return View(db.Events.ToList());
+            int pageSize = 3;
+            int pageNumber = (page ?? 1);
+            return View(dbService.GetAllEvents().ToPagedList(pageNumber, pageSize));
         }
         public ActionResult EditEvent(int? id)
         {
-            return View(db.Events.Find(id));
+            var r = dbService.GetEventbyId(id);
+            return View(r);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult EditEvent(Event events)
         {
-            db.Entry(events).State = EntityState.Modified;
-            db.SaveChanges();
+          
+            if(!dbService.EditEvent(events))
+            {
+                TempData["error"] = "Something Wrong";
+
+            }
             return RedirectToAction("CreateEvent");
         }
         public ActionResult AssignEvent()
         {
-            assignEvent= Assign(assignEvent, db);
+            AssignEvent assignEvent = dbService.AssignEvent();
+            List<SelectListItem> ls = new List<SelectListItem>();
+            foreach (var item in assignEvent.users)
+            {
+                SelectListItem selectListItem = new SelectListItem()
+                {
+                    Text = item.FirstName,
+                    Value = item.U_id.ToString()
+                };
+                ls.Add(selectListItem);
+            }
+            ViewBag.ls = ls;
             return View(assignEvent);
         }
         [HttpPost]
-        public ActionResult AssignEvent(Event_User event_User)
-        {
-            try
+        public ActionResult AssignEvent(IEnumerable<String> U_id,int ?Event_Id, int ?page)
+        {   
+            if (Event_Id == null)
             {
-                db.Event_User.Add(event_User);
-                db.SaveChanges();
-                TempData["error"] = "Assign Event Sucessfully";
-                
+                TempData["error"] = "No Event Available";
             }
-            catch(Exception ex)
+            else if (U_id == null)
             {
-                TempData["error"] = ex.Message;
+                TempData["error"] = "No User is Selected";
             }
-            assignEvent = Assign(assignEvent, db);
-            return View(assignEvent);
+            else
+            {
+                try
+                {
+                    var a = new List<Event_User>();
+                    foreach (var item in U_id)
+                    {
+                        var r = new Event_User();
+                        r.Event_Id = Convert.ToInt32(Event_Id);
+                        r.U_id = Convert.ToInt32(item);
+                        a.Add(r);
+
+                    }
+                    if (dbService.AddEvent_User(a))
+                    {
+                        TempData["error"] = "Assign Event Sucessfully";
+                    }
+                    else
+                    {
+                        TempData["error"] = "Something Wrong";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["error"] = ex.Message;
+                }
+            }
+            //assignEvent = Assign(assignEvent, db);
+            return RedirectToAction("AssignEvent");
         }
         public ActionResult AssignDelete(int id)
         {
-            var r = db.Event_User.Where(x=>x.Event_Id==id).FirstOrDefault();
-            db.Event_User.Remove(r);
-            db.SaveChanges();
-            TempData["error"] = "Deleted Sucessfully";
+            if (!dbService.DeleteEvent_UserById(id))
+            {
+                TempData["error"] = "Something Wrong";
+            }
+            else
+            {
+                TempData["error"] = "Deleted Sucessfully";
+            }
             return RedirectToAction("AssignEvent");
         }
-        public ActionResult DeleteEvent(int id)
+        public ActionResult DeleteEvent(int id,int ?P)
         {
-            db.Events.Remove(db.Events.Find(id));
-            var e = db.Event_User.Where(x => x.Event_Id == id);
-            foreach (var item in e)
+            if (!dbService.RemoveEventById(id))
             {
-                db.Event_User.Remove(item);
-
+                TempData["error"] = "Something Wrong";
             }
-            db.SaveChanges();
-            TempData["error"] = "Deleted Sucessfully";
-            return RedirectToAction("CreateEvent");
+            else
+            {
+                TempData["error"] = "Deleted Sucessfully";
+            }
+            return RedirectToAction("CreateEvent",new {Page=P });
         }
         public ActionResult UserList()
         {
 
-            return View(db.Users.ToList());
+            return View(dbService.GetAllUsers());
         }
         public ActionResult EditUser(int ?id)
         {
-            return View(db.Users.Find(id));
+            return View(dbService.GetUserbyId(id));
         }
         [HttpPost]
         public ActionResult EditUser(User user)
-        {
-            db.Entry(user).State = EntityState.Modified;
-            db.SaveChanges();
+        {   if(!dbService.EditUser(user))
+            {
+                TempData["error"] = "Something Wrong";
+            }
             return RedirectToAction("UserList");
         }
         public ActionResult DeleteUser(int id)
         {
-            db.Users.Remove(db.Users.Find(id));
-            db.Event_User.RemoveRange(db.Event_User.Where(x => x.U_id == id).ToList());
-            db.SaveChanges();
+            if(!dbService.RemoveUserById(id))
+            {
+                TempData["error"] = "Something Wrong";
+            }
             return RedirectToAction("UserList");
         }
         public ActionResult Home()
@@ -147,13 +193,6 @@ namespace Practical1.Controllers
             Session.Remove("name");
             return RedirectToAction("Index","Home");
         }
-        public static AssignEvent Assign(AssignEvent assignEvent,Practical1Entities db)
-        {
-            assignEvent.users = db.Users.Where(x => x.Role.Equals("User")).ToList();
-            assignEvent.events = db.Events.ToList();
-            assignEvent.event_user = db.Event_User.ToList(); ;
-            return assignEvent;
-
-        }
+        
     }
 }

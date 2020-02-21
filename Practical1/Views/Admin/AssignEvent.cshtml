@@ -1,5 +1,4 @@
 ﻿@model Practical1.Models.AssignEvent
-
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -7,54 +6,58 @@
 {
     @Html.AntiForgeryToken()
     <div class="row form-group">
+        @Html.Label("Event_Id", "Event Title")
+
+        <select name="Event_Id" class="form-control">
+            @foreach (var item in Model.events)
+            {
+                <option value="@item.Event_Id">@item.Title</option>
+            }
+        </select>
 
        
-                @Html.Label("U_id", "UserName")
-             <select name="U_id" class="form-control">
-                    @foreach (var item in Model.users)
-                    {
-                        <option value="@item.U_id">@item.FirstName</option>
-                    }
-                </select>
-        </div>
-    <div class="row form-group">
-                @Html.Label("Event_Id", "Event Title")
-                <select name="Event_Id" class="form-control">
-                    @foreach (var item in Model.events)
-                    {
-                        <option value="@item.Event_Id">@item.Title</option>
-                    }
-                </select>
+        <!--<select name="U_id" class="form-control">
+        foreach (var item in Model.users)
+        {
+            <option value="item.U_id">item.FirstName</option>
+        }
+    </select>-->
     </div>
     <div class="row form-group">
-            <button type="submit" class="btn btn-primary">Submit</button>
+        @Html.Label("U_id", "Select Users")
+        @Html.ListBox("U_id", new List<SelectListItem>(ViewBag.ls), new { @class = "form-control" })
+    </div>
+    <div class="row form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
     </div>
 }
-    <hr />
-    <div class="row">
-        <h1>Event Assign To User List</h1>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Sr.No</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>FirstName</th>
-                </tr>
-            </thead>
-            @if (Model.event_user != null)
-            { int i = 1;
-                foreach (var item in Model.event_user)
-                {
+<hr />
+<div class="row">
+    <h1>Event Assign To User List</h1>
+    <table class="table">
+        <thead>
             <tr>
-            <td>@i</td>
-            <td>@item.Event.Title</td>
-            <td>@item.Event.Description</td>
-            <td>@item.User.FirstName</td>
-            <td><button onclick="location.href='@Url.Action("AssignDelete","Admin",new  { id = @item.Event_Id, onclick = "return confirm('Are sure wants to LogOut?');" })'" class="btn btn-primary">Delete</button></td>
-        </tr>i++;
-                }
+                <th>Sr.No</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>FirstName</th>
+            </tr>
+        </thead>
+        @if (Model.event_user != null)
+        {
+            int i = 1;
+            foreach (var item in Model.event_user)
+            {
+                <tr>
+                    <td>@i</td>
+                    <td>@item.Event.Title</td>
+                    <td>@item.Event.Description</td>
+                    <td>@item.User.FirstName</td>
+                    <td><button onclick="location.href='@Url.Action("AssignDelete","Admin",new  { id = @item.id, onclick = "return confirm('Are sure wants to LogOut?');" })'" class="btn btn-primary">Delete</button></td>
+                </tr>
+                i++;
             }
-        </table>
-        </div>
+        }
+    </table>
+</div>
 

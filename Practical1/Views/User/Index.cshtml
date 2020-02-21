@@ -7,6 +7,7 @@
         margin-top: 1%;
     }
 </style>
+
 @using (Html.BeginForm())
 {
 
@@ -18,13 +19,13 @@
         <div class="row form-group">
         </div>
         <div class="row">
-            @Html.TextBoxFor(model => model.Email, new { @class = "form-control",@Placeholder="Email" })
+            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", @Placeholder = "Email" })
             @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
         </div>
         <div class="row form-group">
         </div>
         <div class="row">
-            @Html.PasswordFor(model => model.Password, new { @class = "form-control",@Placeholder="Password" })
+            @Html.PasswordFor(model => model.Password, new { @class = "form-control", @Placeholder = "Password" })
             @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
         </div>
         <div class="row form-group">
